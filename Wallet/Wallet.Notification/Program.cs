@@ -1,0 +1,1 @@
+﻿// O nome do meu tópico vai se chamar wallet.events

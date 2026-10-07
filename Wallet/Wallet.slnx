@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Transaction.Api/Transaction.Api.csproj" />
+  <Project Path="Wallet.Api/Wallet.Api.csproj" />
+  <Project Path="Wallet.Notification/Wallet.Notification.csproj" />
+</Solution>
