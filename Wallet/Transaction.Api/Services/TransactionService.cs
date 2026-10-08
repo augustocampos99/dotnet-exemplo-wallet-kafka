@@ -20,5 +20,14 @@ namespace Transaction.Api.Services
                 .Take(take)
                 .ToListAsync();
         }
+
+        public async Task<List<Entities.Transaction>> FindAllByWalletId(Guid walletId, int skip, int take)
+        {
+            return await this._context.Transactions
+                .Where(e => e.WalletId == walletId)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
     }
 }
