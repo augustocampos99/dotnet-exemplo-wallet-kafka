@@ -15,13 +15,18 @@ CREATE TABLE wallets (
 
 CREATE TABLE transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    wallet_id UUID NOT NULL,
+    wallet_origin_id UUID NOT NULL,
+    wallet_destiny_id UUID NULL,
     type VARCHAR(20) NOT NULL,
     amount NUMERIC(19, 2) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_transaction_wallet
-        FOREIGN KEY (wallet_id)
+    CONSTRAINT fk_transaction_wallet_origin
+        FOREIGN KEY (wallet_origin_id)
+        REFERENCES wallets(id),
+
+    CONSTRAINT fk_transaction_wallet_destiny
+        FOREIGN KEY (wallet_destiny_id)
         REFERENCES wallets(id),
 
     CONSTRAINT chk_transaction_amount
@@ -31,5 +36,3 @@ CREATE TABLE transactions (
         CHECK (type IN ('DEPOSIT', 'WITHDRAW', 'TRANSFER'))
 );
 
-CREATE INDEX idx_transactions_wallet_id
-    ON transactions(wallet_id);

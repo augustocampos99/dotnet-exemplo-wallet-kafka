@@ -11,8 +11,11 @@ namespace Transaction.Api.Entities
         [Column("id")]
         public Guid Id { get; set; }
 
-        [Column("wallet_id")]
-        public Guid WalletId { get; set; }
+        [Column("wallet_origin_id")]
+        public Guid WalletOriginId { get; set; }
+
+        [Column("wallet_destiny_id")]
+        public Guid? WalletDestinyId { get; set; }
 
         [Column("type")]
         public TransactionTypeEnum Type { get; set; }

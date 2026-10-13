@@ -24,7 +24,7 @@ namespace Transaction.Api.Services
         public async Task<List<Entities.Transaction>> FindAllByWalletId(Guid walletId, int skip, int take)
         {
             return await this._context.Transactions
-                .Where(e => e.WalletId == walletId)
+                .Where(e => e.WalletOriginId == walletId)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

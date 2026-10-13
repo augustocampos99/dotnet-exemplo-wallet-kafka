@@ -78,7 +78,8 @@ namespace Wallet.Api.Services
             var transaction = new TransactionQueue()
             {
                 Id = Guid.NewGuid(),
-                WalletId = wallet.Id,
+                WalletOriginId = wallet.Id,
+                WalletDestinyId = null,
                 Amount = transactionRequest.Amount,
                 Type = Enums.TransactionTypeEnum.DEPOSIT
             };
@@ -113,7 +114,8 @@ namespace Wallet.Api.Services
             var transaction = new TransactionQueue()
             {
                 Id = Guid.NewGuid(),
-                WalletId = wallet.Id,
+                WalletOriginId = wallet.Id,
+                WalletDestinyId = null,
                 Amount = transactionRequest.Amount,
                 Type = Enums.TransactionTypeEnum.WITHDRAW
             };
@@ -156,7 +158,8 @@ namespace Wallet.Api.Services
             var transaction = new TransactionQueue()
             {
                 Id = Guid.NewGuid(),
-                WalletId = walletOrigin.Id,
+                WalletOriginId = walletOrigin.Id,
+                WalletDestinyId = transferRequest.WalletDestinyId,
                 Amount = transferRequest.Amount,
                 Type = Enums.TransactionTypeEnum.TRANSFER
             };
