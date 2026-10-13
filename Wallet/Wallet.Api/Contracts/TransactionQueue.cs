@@ -11,5 +11,6 @@ namespace Wallet.Api.Contracts
         public TransactionTypeEnum Type { get; set; }
 
         public decimal Amount { get; set; }
+
     }
 }

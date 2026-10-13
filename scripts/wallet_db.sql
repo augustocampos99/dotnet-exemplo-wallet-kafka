@@ -28,7 +28,7 @@ CREATE TABLE transactions (
         CHECK (amount > 0),
 
     CONSTRAINT chk_transaction_type
-        CHECK (type IN ('DEPOSIT', 'WITHDRAW'))
+        CHECK (type IN ('DEPOSIT', 'WITHDRAW', 'TRANSFER'))
 );
 
 CREATE INDEX idx_transactions_wallet_id

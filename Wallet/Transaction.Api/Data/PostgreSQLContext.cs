@@ -12,7 +12,15 @@ namespace Transaction.Api.Data
         public PostgreSQLContext()
         {            
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Transaction.Api.Entities.Transaction>()
+                .Property(t => t.Type)
+                .HasConversion<string>()
+                .HasColumnName("type");
 
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<Entities.Transaction> Transactions { get; set; }
 
     }

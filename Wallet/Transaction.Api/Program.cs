@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Transaction.Api.Consumers;
 using Transaction.Api.Data;
 using Transaction.Api.Services;
 using Transaction.Api.Services.Interfaces;
@@ -17,6 +18,9 @@ builder.Services.AddDbContext<PostgreSQLContext>(options =>
 // DI Services
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 
+// Start Kafka consumers as BAckgroundService
+builder.Services.AddHostedService<ConsumerTransactionService>();
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -34,3 +38,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

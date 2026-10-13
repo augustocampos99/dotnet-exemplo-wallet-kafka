@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Confluent.Kafka;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using Wallet.Api.Contracts;
 using Wallet.Api.Data;
 using Wallet.Api.Entities;
@@ -9,10 +11,12 @@ namespace Wallet.Api.Services
     public class WalletService : IWalletService
     {
         private readonly PostgreSQLContext _context;
+        private readonly IConfiguration _configuration;
 
-        public WalletService(PostgreSQLContext context)
+        public WalletService(PostgreSQLContext context, IConfiguration configuration)
         {
             this._context = context;            
+            this._configuration = configuration;
         }
 
         public async Task<List<Entities.Wallet>> FindAll(int skip, int take)
@@ -71,6 +75,15 @@ namespace Wallet.Api.Services
             wallet.UpdatedAt = DateTime.Now;
             await this._context.SaveChangesAsync();
 
+            var transaction = new TransactionQueue()
+            {
+                Id = Guid.NewGuid(),
+                WalletId = wallet.Id,
+                Amount = transactionRequest.Amount,
+                Type = Enums.TransactionTypeEnum.DEPOSIT
+            };
+            await this.KafkaProducer(JsonSerializer.Serialize(transaction));
+
             return wallet;
         }
 
@@ -96,6 +109,15 @@ namespace Wallet.Api.Services
             wallet.Balance -= transactionRequest.Amount;
             wallet.UpdatedAt = DateTime.Now;
             await this._context.SaveChangesAsync();
+
+            var transaction = new TransactionQueue()
+            {
+                Id = Guid.NewGuid(),
+                WalletId = wallet.Id,
+                Amount = transactionRequest.Amount,
+                Type = Enums.TransactionTypeEnum.WITHDRAW
+            };
+            await this.KafkaProducer(JsonSerializer.Serialize(transaction));
 
             return wallet;
         }
@@ -131,7 +153,37 @@ namespace Wallet.Api.Services
 
             await this._context.SaveChangesAsync();
 
+            var transaction = new TransactionQueue()
+            {
+                Id = Guid.NewGuid(),
+                WalletId = walletOrigin.Id,
+                Amount = transferRequest.Amount,
+                Type = Enums.TransactionTypeEnum.TRANSFER
+            };
+            await this.KafkaProducer(JsonSerializer.Serialize(transaction));
+
             return walletOrigin;
+        }
+
+        private async Task KafkaProducer(string message)
+        {
+            string kafkaHost = _configuration.GetValue<string>("KafkaConfiguration:Host")!;
+            string walletTopic = _configuration.GetValue<string>("KafkaConfiguration:Topics:WALLET")!;
+
+            var config = new ProducerConfig { BootstrapServers = kafkaHost };
+
+            using (var producer = new ProducerBuilder<Null, string>(config).Build())
+            {
+                try
+                {
+                    var deliveryResult = await producer.ProduceAsync(walletTopic, new Message<Null, string> { Value = message });
+                    Console.WriteLine($"Delivered '{deliveryResult.Value}' to '{deliveryResult.TopicPartitionOffset}'");
+                }
+                catch (ProduceException<Null, string> e)
+                {
+                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                }
+            }
         }
     }
 }
